@@ -5,7 +5,7 @@ from matplotlib.widgets import Button, Slider, RadioButtons
 from matplotlib.patches import FancyBboxPatch
 import matplotlib.colors as mcolors
 
-# Import logic from the other file
+
 from astar_logic import astar
 
 # --- CONFIGURATION ---
