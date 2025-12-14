@@ -4,61 +4,15 @@ import matplotlib.animation as animation
 from matplotlib.widgets import Button, Slider, RadioButtons
 from matplotlib.patches import FancyBboxPatch
 import matplotlib.colors as mcolors
-import heapq
+
+# Import logic from the other file
+from astar_logic import astar
 
 # --- CONFIGURATION ---
-GRID_SIZE = 100       # Map resolution
+GRID_SIZE = 50       # Map resolution
 ROBOT_SPEED = 2      # Robot movement speed (Nodes per frame). Higher = Faster.
-EXPLORE_SPEED = 25   # Exploration visualization speed (Nodes per frame).
+EXPLORE_SPEED = 50   # Exploration visualization speed (Nodes per frame).
 
-# --- 1. A* Algorithm (Logic Only) ---
-def heuristic(a, b):
-    return np.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)
-
-def astar(grid, start, goal):
-    neighbors = [(0,1), (0,-1), (1,0), (-1,0), (1,1), (1,-1), (-1,1), (-1,-1)]
-    close_set = set()
-    came_from = {}
-    g_score = {start: 0}
-    f_score = {start: heuristic(start, goal)}
-    oheap = []
-    heapq.heappush(oheap, (f_score[start], start))
-    explored_nodes = []
-
-    while oheap:
-        current = heapq.heappop(oheap)[1]
-        explored_nodes.append(current)
-
-        if current == goal:
-            path = []
-            while current in came_from:
-                path.append(current)
-                current = came_from[current]
-            return path[::-1], explored_nodes
-
-        close_set.add(current)
-        
-        for i, j in neighbors:
-            neighbor = (current[0] + i, current[1] + j)
-            if 0 <= neighbor[0] < grid.shape[0] and 0 <= neighbor[1] < grid.shape[1]:
-                if grid[neighbor[0]][neighbor[1]] == 1: continue
-            else: continue
-            
-            move_cost = np.sqrt(i**2 + j**2)
-            tentative_g_score = g_score[current] + move_cost
-
-            if neighbor in close_set and tentative_g_score >= g_score.get(neighbor, 0):
-                continue
-                
-            if tentative_g_score < g_score.get(neighbor, float('inf')):
-                came_from[neighbor] = current
-                g_score[neighbor] = tentative_g_score
-                f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
-                heapq.heappush(oheap, (f_score[neighbor], neighbor))
-                
-    return [], explored_nodes
-
-# --- 2. Interactive App Class ---
 class MazeApp:
     def __init__(self):
         self.grid_size = GRID_SIZE
@@ -123,7 +77,7 @@ class MazeApp:
         for spine in ax_slider.spines.values(): spine.set_visible(False)
         self.s_brush.on_changed(self.update_brush_size)
 
-        # 3. Buttons
+        # 3. Buttons helper
         def setup_rounded_button(rect, text, is_primary, callback):
             ax_btn = plt.axes(rect, frameon=False)
             base_color = self.c_primary if is_primary else self.c_secondary
@@ -246,6 +200,7 @@ class MazeApp:
         self.set_title(f"Solving...", color=self.c_text_on_sec)
         self.fig.canvas.draw_idle()
         
+        # Call the imported logic
         path, explored = astar(self.grid, self.start, self.goal)
         
         if not path:
@@ -258,30 +213,23 @@ class MazeApp:
 
         self.set_title("Path Found! Animating...")
 
-        # --- ANIMATION LOGIC (UPDATED WITH SPEED) ---
-        # 1. Calculate how fast to draw exploration
+        # --- ANIMATION LOGIC ---
         steps_per_frame_explore = max(1, len(explored) // EXPLORE_SPEED)
         frames_explore = (len(explored) // steps_per_frame_explore) + 5
         
-        # 2. Calculate frames for robot movement (affected by ROBOT_SPEED)
         frames_robot = (len(path) // ROBOT_SPEED) + 10
         total_frames = frames_explore + frames_robot
 
         def animate(i):
-            # Phase 1: Exploration
             if i < frames_explore:
                 explore_idx = min(i * steps_per_frame_explore, len(explored))
                 if explore_idx > 0:
                     pts = np.array([[n[1], n[0]] for n in explored[:explore_idx]])
                     self.scatter_explore.set_offsets(pts)
-            
-            # Phase 2: Robot Movement
             else:
-                # Ensure path is drawn
                 px, py = zip(*[(n[1], n[0]) for n in path])
                 self.line_path.set_data(px, py)
                 
-                # Calculate robot position based on speed
                 robot_frame = i - frames_explore
                 path_idx = min(robot_frame * ROBOT_SPEED, len(path) - 1)
                 
@@ -294,4 +242,5 @@ class MazeApp:
         self.ani = animation.FuncAnimation(self.fig, animate, frames=total_frames, interval=20, blit=True, repeat=False)
         self.fig.canvas.draw_idle()
 
-MazeApp()
+if __name__ == "__main__":
+    MazeApp()
