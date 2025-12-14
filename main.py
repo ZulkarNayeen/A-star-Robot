@@ -9,9 +9,9 @@ import matplotlib.colors as mcolors
 from astar_logic import astar
 
 # --- CONFIGURATION ---
-GRID_SIZE = 50       # Map resolution
+GRID_SIZE = 100      # Map resolution
 ROBOT_SPEED = 2      # Robot movement speed (Nodes per frame). Higher = Faster.
-EXPLORE_SPEED = 50   # Exploration visualization speed (Nodes per frame).
+EXPLORE_SPEED = 25   # Exploration visualization speed (Nodes per frame).
 
 class MazeApp:
     def __init__(self):

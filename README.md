@@ -1,18 +1,22 @@
 # A* Pathfinding Visualizer
 
+![A* Pathfinding Visualizer Screenshot](image.png)
+
 This project is an interactive tool for visualizing the A* pathfinding algorithm in a 2D grid environment. Users can draw and erase obstacles, set the start and goal positions, and watch the algorithm find the optimal path in real-time.
 
 ## Features
 
 - **Interactive Maze Creation:** Click and drag to draw or erase obstacle walls directly on the grid.
 - **Customizable Start/Goal:** Easily move the start and goal markers to any valid position.
-- **A* Algorithm Visualization:** Watch the A* algorithm explore the grid step-by-step.
-- **Path Animation:** Once a path is found, a marker will animate its movement from the start to the goal.
-- **Adjustable Brush Size:** Change the size of the brush for drawing obstacles.
+- **A* Algorithm Visualization:** Watch the A* algorithm explore the grid step-by-step, showing visited nodes.
+- **Dual-Phase Animation:** The visualization first shows the exploration process and then animates a robot moving along the final, optimal path.
+- **Adjustable Controls:** Use the slider to change the brush size for drawing obstacles. Robot and exploration speeds can be configured directly in the script.
+- **Modern UI:** A clean, modern interface built with Matplotlib widgets, featuring a custom color palette and interactive, styled buttons.
 
 ## Project Structure
 
-- `main.py`: The single, all-in-one script that runs the entire interactive application.
+- `main.py`: The main script that runs the entire interactive application, including the GUI and event handling.
+- `astar_logic.py`: Contains the core A* pathfinding algorithm logic.
 - `requirements.txt`: A list of the required Python packages.
 - `output/`: This directory is currently unused but can be utilized for saving outputs if needed in the future.
 
